@@ -2,11 +2,13 @@ import { useState } from "react";
 
 import searchSvg from "../assets/search.svg";
 import { CATEGORIES } from "../utils/categories";
+import { formatCurrency } from "../utils/formatCurrency";
 
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { RefundItem } from "../components/RefundItem";
 
+<<<<<<< HEAD
 const REFUND_EXAMPLE = {
   id: "123",
   name: "Rodrigo",
@@ -14,6 +16,17 @@ const REFUND_EXAMPLE = {
   amount: "34,50",
   categoryImg: CATEGORIES["transport"].icon,
 };
+=======
+const REFUND_EXAMPLE = [
+  {
+    id: "123",
+    name: "Rodrigo",
+    category: "Transporte",
+    amount: formatCurrency(34.5),
+    categoryImg: CATEGORIES["transport"].icon,
+  },
+];
+>>>>>>> da1d27f (formatCurrency)
 
 export function Dashboard() {
   const [name, setName] = useState("");
