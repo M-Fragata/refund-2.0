@@ -7,32 +7,21 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Pagination } from "../components/Pagination";
-import { RefundItem } from "../components/RefundItem";
+import { RefundItem, RefundItemProps } from "../components/RefundItem";
 
-<<<<<<< HEAD
 const REFUND_EXAMPLE = {
   id: "123",
   name: "Rodrigo",
   category: "Transporte",
-  amount: "34,50",
+  amount: formatCurrency(34.5),
   categoryImg: CATEGORIES["transport"].icon,
 };
-=======
-const REFUND_EXAMPLE = [
-  {
-    id: "123",
-    name: "Rodrigo",
-    category: "Transporte",
-    amount: formatCurrency(34.5),
-    categoryImg: CATEGORIES["transport"].icon,
-  },
-];
->>>>>>> da1d27f (formatCurrency)
 
 export function Dashboard() {
   const [name, setName] = useState("");
   const [page, setPage] = useState(1);
   const [totalOfPage, setTotalOfPage] = useState(10);
+  const [refunds, setRefunds] = useState<RefundItemProps[]>([REFUND_EXAMPLE]);
 
   function fetchRefunds(e: React.FormEvent) {
     e.preventDefault();
@@ -72,8 +61,14 @@ export function Dashboard() {
         </Button>
       </form>
 
-      <div className="mt-6 flex flex-col gap-4 max-h-[342px] overflow-y-scroll">
-        <RefundItem data={REFUND_EXAMPLE} />
+      <div className="my-6 flex flex-col gap-4 max-h-[342px] overflow-y-scroll">
+        {refunds.map((item) => (
+          <RefundItem
+            key={item.id}
+            data={REFUND_EXAMPLE}
+            href={`/refund/${item.id}`}
+          />
+        ))}
       </div>
 
       <Pagination
