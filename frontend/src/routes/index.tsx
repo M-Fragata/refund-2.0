@@ -7,13 +7,8 @@ import { ManagerRoutes } from "./ManagerRoutes";
 import { EmployeeRoutes } from "./EmployeeRoutes";
 
 const isLoading = false;
-// const session = undefined
 
-const session = {
-  user: {
-    role: "",
-  },
-};
+const session = JSON.parse(localStorage.getItem("session") || 'null');
 
 export function Routes() {
   function Route() {
