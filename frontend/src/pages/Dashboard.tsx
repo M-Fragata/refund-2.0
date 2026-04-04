@@ -9,6 +9,7 @@ import { Button } from "../components/Button";
 import { Pagination } from "../components/Pagination";
 import { RefundItem, RefundItemProps } from "../components/RefundItem";
 
+
 const REFUND_EXAMPLE = {
   id: "123",
   name: "Rodrigo",
@@ -18,10 +19,12 @@ const REFUND_EXAMPLE = {
 };
 
 export function Dashboard() {
+
   const [name, setName] = useState("");
   const [page, setPage] = useState(1);
   const [totalOfPage, setTotalOfPage] = useState(10);
   const [refunds, setRefunds] = useState<RefundItemProps[]>([REFUND_EXAMPLE]);
+
 
   function fetchRefunds(e: React.FormEvent) {
     e.preventDefault();

@@ -1,7 +1,20 @@
+import { useAuth } from "../hooks/useAuth";
+
 import logoSvg from "../assets/logo.svg";
 import logoutSvg from "../assets/logout.svg";
 
 export function Header() {
+
+  const auth = useAuth()
+
+  function handleOut() {
+    confirm("Deseja sair?")
+
+    if(!confirm) return
+
+    auth.out()
+  }
+
   return (
     <header className="w-full flex justify-between">
       <img src={logoSvg} alt="Logo" className="my-8" />
@@ -14,6 +27,7 @@ export function Header() {
         <img
           src={logoutSvg}
           alt="Ícone de sair"
+          onClick={handleOut}
           className="my-8 cursor-pointer hover:opacity-75 transition ease-linear"
         />
       </div>

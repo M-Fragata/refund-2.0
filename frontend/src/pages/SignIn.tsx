@@ -3,6 +3,7 @@ import { z, ZodError } from "zod";
 import { AxiosError } from "axios";
 
 import { api } from "../services/api";
+import { useAuth } from "../hooks/useAuth";
 
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
@@ -15,34 +16,42 @@ const signInSchema = z.object({
 
 export function SignIn() {
   const [state, formAction, isLoading] = useActionState(onSignIn, {
-    email: "",
-    password: ""
+    message: null,
+    payload: {
+      email: "",
+      password: ""
+    }
   });
 
+  const auth = useAuth()
 
-  async function onSignIn(prevState: any, formData: FormData) {
+  async function onSignIn(_: any, formData: FormData) {
+
+    const payload = {
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+    }
 
     try {
 
-      const data = signInSchema.parse({
-        email: formData.get("email") as string,
-        password: formData.get("password") as string,
-      });
-      
+      const data = signInSchema.parse(payload);
+
       const response = await api.post("/sessions", data);
 
-      console.log(response.data)
+      auth.save(response.data)
+
+      return { message: null, payload: null }
 
     } catch (error) {
 
       console.error(error);
 
       if (error instanceof ZodError) {
-        return {message: error.issues[0].message}
+        return { message: error.issues[0].message, payload }
       } else if (error instanceof AxiosError) {
-        return {message: error.response?.data.message || "Ocorreu um erro inesperado. Tente novamente."}
+        return { message: error.response?.data.message || "Ocorreu um erro inesperado. Tente novamente.", payload }
       } else {
-        return {message: "Ocorreu um erro inesperado. Tente novamente."}
+        return { message: "Ocorreu um erro inesperado. Tente novamente.", payload }
       }
 
     }
@@ -57,6 +66,7 @@ export function SignIn() {
         legend="E-mail"
         type="email"
         placeholder="seu@email.com"
+        defaultValue={state.payload?.email}
       />
       <Input
         name="password"
@@ -64,7 +74,7 @@ export function SignIn() {
         legend="Senha"
         type="password"
         placeholder="123456"
-
+        defaultValue={state.payload?.password}
       />
 
       <p className="text-red-500 text-sm">{state?.message}</p>

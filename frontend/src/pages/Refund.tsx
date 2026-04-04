@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { z, ZodError } from "zod"
+import { AxiosError } from "axios";
+import { api } from "../services/api";
 
 import fileSvg from "../assets/file.svg";
 import { CATEGORIES, CATEGORIES_KEYS } from "../utils/categories";
@@ -9,26 +12,74 @@ import { Select } from "../components/Select";
 import { Upload } from "../components/Upload";
 import { Button } from "../components/Button";
 
+const refundSchema = z.object({
+  name: z.string().trim().min(3, { message: "Informe um nome claro para sua solicitação" }),
+  category: z.string().trim().min(1),
+  amount: z.coerce.number({ message: "Informe um valor válido" }).positive({ message: "Informe um valor superior a 0" })
+
+})
+
 export function Refund() {
-  const [name, setName] = useState("Teste");
-  const [amount, setAmount] = useState("34");
-  const [category, setCategory] = useState("transport");
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [filename, setFilename] = useState<File | null>(null);
 
   const navigate = useNavigate();
   const params = useParams<{ id: string }>();
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (params.id) {
       return navigate(-1);
     }
 
-    console.log(name, amount, category, filename);
+    try {
 
-    navigate("/confirm", { state: { fromSubmit: true } });
+      setIsLoading(true)
+
+      if (!filename) {
+        return alert("Selecione um arquivo de comprovante")
+      }
+
+      const fineUploadForm = new FormData()
+      fineUploadForm.append("file", filename)
+
+      const response = await api.post("/uploads", fineUploadForm)
+
+      const data = refundSchema.parse({
+        name: name,
+        amount: amount.replace(",", "."),
+        category: category
+      })
+
+      await api.post("/refunds", {
+        ...data,
+        filename: response.data.filename
+      })
+
+      navigate("/confirm", { state: { fromSubmit: true } });
+
+    } catch (error) {
+      console.log(error)
+
+      if (error instanceof ZodError) {
+        return alert(error.issues[0].message)
+      }
+
+      if (error instanceof AxiosError) {
+        return alert(error.response?.data.message)
+      }
+
+      alert("N]ao foi possível realizar a solicitação")
+
+    } finally {
+
+      setIsLoading(false)
+
+    }
   }
 
   return (
