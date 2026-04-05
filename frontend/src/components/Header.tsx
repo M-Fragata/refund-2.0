@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import { useAuth } from "../hooks/useAuth";
 
 import logoSvg from "../assets/logo.svg";
@@ -5,15 +7,31 @@ import logoutSvg from "../assets/logout.svg";
 
 export function Header() {
 
+  const [user, setUser] = useState<string>("")
+
   const auth = useAuth()
 
   function handleOut() {
     confirm("Deseja sair?")
 
-    if(!confirm) return
+    if (!confirm) return
 
     auth.out()
   }
+
+  function getNameUser() {
+    const userStorage = localStorage.getItem(`@refund:user`)
+
+    if(!userStorage) return
+
+    setUser((JSON.parse(userStorage).name).split(" ")[0])
+  }
+
+  useEffect(() => {
+
+    getNameUser()
+
+  }, [])
 
   return (
     <header className="w-full flex justify-between">
@@ -21,7 +39,7 @@ export function Header() {
 
       <div className="flex items-center gap-3">
         <span className="text-sm font-semibold text-gray-200">
-          Olá, Rodrigo
+          {user ? `Olá, ${user}` : ""}
         </span>
 
         <img

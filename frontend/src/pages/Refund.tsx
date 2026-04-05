@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { z, ZodError } from "zod"
 import { AxiosError } from "axios";
@@ -6,6 +6,8 @@ import { api } from "../services/api";
 
 import fileSvg from "../assets/file.svg";
 import { CATEGORIES, CATEGORIES_KEYS } from "../utils/categories";
+
+import { formatCurrency } from "../utils/formatCurrency";
 
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
@@ -73,7 +75,7 @@ export function Refund() {
         return alert(error.response?.data.message)
       }
 
-      alert("N]ao foi possível realizar a solicitação")
+      alert("Não foi possível realizar a solicitação")
 
     } finally {
 
@@ -81,6 +83,36 @@ export function Refund() {
 
     }
   }
+
+  async function getRefund() {
+    try {
+      const id = params.id
+
+      const response = await api.get<RefundAPIResponse>(`/refunds/${id}`)     
+
+      console.log(response.data)
+
+      setName(response.data.name)
+      setAmount(formatCurrency(response.data.amount))
+      setCategory(response.data.category)
+      setFilename(response.data.filename)
+
+    } catch (error) {
+      console.log(error)
+
+      if(error instanceof AxiosError){
+        return alert(error.response?.data.message)
+      }
+
+      alert("Não foi possível encontrar esse refund")
+    }
+  }
+
+  useEffect(() => {
+    if(params.id){
+      getRefund()
+    }
+  }, [params.id])
 
   return (
     <form
@@ -130,7 +162,7 @@ export function Refund() {
 
       {params.id ? (
         <a
-          href="https://www.rocketseat.com.br/"
+          href={`http://localhost:3333/uploads/${filename}`}
           target="_black"
           className="text-sm text-green-100 font-semibold flex items-center justify-center gap-2 my-6 hover:opacity-70 transition ease-linear"
         >
